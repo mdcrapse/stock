@@ -1,7 +1,12 @@
 import pandas as pd
 import numpy as np
+import yfinance as yf
 
-df = pd.read_csv("./NIFTY_500_day.csv")
+stock_list= ["AAPL", "GOOG", "MSFT", "AMZN"]
+
+ticker = yf.Ticker('ADTB')
+df = ticker.history(period="100d")
+
 new_data = []
 
 # Get the average price

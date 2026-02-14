@@ -1,2 +1,5 @@
 'https://download.pytorch.org/whl/cu126'
 'xgboost'
+'python-dotenv'
+'requests'
+'yfinance'

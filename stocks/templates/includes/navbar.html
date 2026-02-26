@@ -1,6 +1,10 @@
+{% load static %}
 <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'home' %}">📈 StockUp</a>
+    <a href="{% url 'home' %}">
+      <img class="navbar-brand" src="{% static 'icon.svg' %}" href="{% url 'home' %}" height="80" />
+    </a>
+    <!-- <a class="navbar-brand" href="{% url 'home' %}">📈 StockUp</a> -->
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
       <span class="navbar-toggler-icon"></span>

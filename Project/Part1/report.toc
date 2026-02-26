@@ -1,0 +1,12 @@
+\contentsline {section}{\numberline {1}Project Plan}{2}{}%
+\contentsline {section}{\numberline {2}Introduction}{2}{}%
+\contentsline {subsection}{\numberline {2.1}Understanding of the Project}{2}{}%
+\contentsline {subsection}{\numberline {2.2}Interpretation of Requirements}{2}{}%
+\contentsline {section}{\numberline {3}Technology Stack}{2}{}%
+\contentsline {subsection}{\numberline {3.1}Backend}{2}{}%
+\contentsline {subsubsection}{\numberline {3.1.1}Language}{2}{}%
+\contentsline {subsubsection}{\numberline {3.1.2}Libraries}{3}{}%
+\contentsline {subsection}{\numberline {3.2}Database}{3}{}%
+\contentsline {subsection}{\numberline {3.3}Visualization Tools}{3}{}%
+\contentsline {section}{\numberline {4}ER Diagram}{4}{}%
+\contentsline {section}{\numberline {5}Timeline of Deliverables}{4}{}%

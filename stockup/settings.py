@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "stocks.apps.StocksConfig",
+    'stocks.apps.StocksConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -68,6 +68,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'stockup.wsgi.application'
+
+AUTH_USER_MODEL = 'stocks.User'
 
 
 # Database

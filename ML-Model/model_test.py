@@ -4,9 +4,6 @@ import xgboost as xgb
 import joblib
 import yfinance as yf
 
-# -------------------------------
-# 📦 TICKERS
-# -------------------------------
 tickers_list = {
     "SAP": "Tech", "MSFT": "Tech", "IBM": "Tech", "NVDA": "Tech", "AAPL": "Tech",
     "VRTX": "Health", "ABT": "Health", "TAK": "Health", "ISRG": "Health", "HCA": "Health",
@@ -21,23 +18,14 @@ tickers_list = {
     "NEE": "Utilities", "AXIA": "Utilities", "ATO": "Utilities", "AWK": "Utilities", "SRE": "Utilities"
 }
 
-# -------------------------------
-# 📥 LOAD MODEL + STRUCTURE
-# -------------------------------
 train_df = pd.read_csv("./data_processed.csv")
 X_columns = train_df.drop(columns=['Target_30Day']).columns
 type_columns = [col for col in X_columns if col.startswith("Type_")]
 
 model = joblib.load('./model.pkl')
 
-# -------------------------------
-# 📊 RESULTS STORAGE
-# -------------------------------
 results = []
 
-# -------------------------------
-# 🔁 LOOP THROUGH STOCKS
-# -------------------------------
 for ticker_name, ticker_type in tickers_list.items():
     try:
         ticker = yf.Ticker(ticker_name)
@@ -105,9 +93,6 @@ for ticker_name, ticker_type in tickers_list.items():
     except Exception as e:
         print(f"Error with {ticker_name}: {e}")
 
-# -------------------------------
-# 📈 SUMMARY
-# -------------------------------
 results_df = pd.DataFrame(results)
 
 print("\n===== SUMMARY =====")

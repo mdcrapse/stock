@@ -6,8 +6,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 # Pick out our training and prediction data
 df = pd.read_csv("./data_processed.csv")
-X = df.drop(columns=['30Day'])
-y = df['30Day']
+X = df.drop(columns=['Target_30Day'])
+y = df['Target_30Day']
 
 # Load the model
 loaded_model = xgb.XGBRegressor()

@@ -1,91 +1,50 @@
 import pandas as pd
 import numpy as np
-import yfinance as yf
 
-stock_list= ["AAPL", "GOOG", "MSFT", "AMZN"]
-
-ticker = yf.Ticker('ADTB')
-df = ticker.history(period="100d")
-
+# Load the data
+df = pd.read_csv("data.csv")
 new_data = []
 
-# Get the average price
-df['avg_cost'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
+# Process rows into history[day - 100 : current day], 30 day out price, percent return, type
+for i in range(100, len(df) - 30):
+    # Get the current row
+    row = df.iloc[i]
     
+    # We use Cosine of the year progress so that december is next to january
+    date_obj = pd.to_datetime(row.Date)
+    day_of_year = date_obj.dayofyear
+    cyclical_date = np.cos(2 * np.pi * day_of_year / 366.0)
 
-for _,row in df.iterrows():
-    # Isolate the month and day
-    date = row.date.split('-')
-    month_raw = float(date[1])
-    day_raw = float(date[2].split()[0])
+    # Get the stock history and calculate percent return
+    prices = df.iloc[i-100 : i]['Close'].values
+    returns = np.diff(prices) / prices[:-1]
+    
+    future_val = df.iloc[i+30]['Close']
+    current_val = row.Close
+    percent_return = (future_val - current_val) / current_val
+    percent_return = np.clip(percent_return, -0.5, 0.5)
 
-    # Turn them into cyclical sin values so the ML algorithm can understand it better
-    month_normalized = month_raw / 12
-    day_normalized = day_raw / 31
-
-    new_row = []
-    new_row.append(month_normalized)
-    new_row.append(day_normalized)
-
-    normalization_min = 9999999999
-    normalization_max = 0
-
-    unnormalized_averages = []
-
-    # Get the data for the last 100 days
-    for x in range(100):
-        inverse_x = 100 - x
-        iloc_minus_x = df.index.get_loc(row.name) - inverse_x
-
-        # Break for bounds
-        if(iloc_minus_x < 0):
-            break
-
-        cur_avg = df.iloc[iloc_minus_x].avg_cost
-
-        if(cur_avg < normalization_min):
-            normalization_min = cur_avg
-
-        if(cur_avg > normalization_max):
-            normalization_max = cur_avg
-
-        unnormalized_averages.append(cur_avg)
-
-    # Calculate the normalization of the unnormalized averages and add them to new row
-    for avg in unnormalized_averages:
-        normalized_avg = (avg - normalization_min) / (normalization_max - normalization_min)
-        new_row.append(normalized_avg)
-
-    # Get the data 30 days into the future
-    iloc_plus_thirty = df.index.get_loc(row.name) + 30
-
-    # Break for bounds
-    if(iloc_plus_thirty >= len(df) - 1):
-        break
-
-    # Normalize the thirty day look ahead
-    raw_thirty_day = df.iloc[iloc_plus_thirty].avg_cost
-    normalized_thirty_day = (raw_thirty_day - normalization_min) / (normalization_max - normalization_min)
-    new_row.append(normalized_thirty_day)
-
-    # Add the values to the new data
+    volatility = np.std(returns)
+    mean_return = np.mean(returns)
+    
+    # Add to the new row
+    new_row = [cyclical_date, volatility, mean_return] + returns.tolist() + [percent_return, row.Type]
     new_data.append(new_row)
 
+# Create dataframe and heeaders
+return_headers = [f"Return{j}" for j in range(99)]
 
-# Convert the new data into a dataframe
-new_df = pd.DataFrame(new_data)
-new_df.dropna(inplace=True)
+headers = (
+    ["Date_Cyclic", "Volatility", "Mean_Return"] +
+    return_headers +
+    ["Target_30Day", "Type"]
+)
 
-headers = []
-for column in new_df:
-    match column:
-        case 0:
-            headers.append("Month")
-        case 1:
-            headers.append("Day")
-        case 102:
-            headers.append("30Day")
-        case _:
-            headers.append("Hist" + str(column - 1))
+new_df = pd.DataFrame(new_data, columns=headers)
 
-new_df.to_csv("./data_processed.csv", index=False, header=headers)
+# One hot encoding for type
+new_df = pd.get_dummies(new_df, columns=['Type'], prefix='Type')
+
+# Export
+new_df.to_csv("./data_processed.csv", index=False)
+print(f"File saved with {len(new_df.columns)} columns and {len(new_df)} rows.")

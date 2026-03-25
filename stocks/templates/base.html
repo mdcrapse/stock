@@ -12,11 +12,11 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
     {% include "includes/navbar.html" %}
 
-    <main class="container mt-4">
+    <main class="container mt-4 flex-fill">
         {% block content %}
         {% endblock %}
     </main>

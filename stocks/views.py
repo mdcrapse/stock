@@ -1,5 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
+from .predictor import predict_stock
+import json
+from django.http import JsonResponse
 
 # from .models import Question
 
@@ -18,6 +21,18 @@ def about(request):
 
 def contact(request):
     return render(request, "contact.html")
+
+def invest(request):
+    if request.method == "POST":
+            # Check if the request is JSON
+            data = json.loads(request.body)
+            ticker = data.get('ticker_symbol')
+            sector = data.get('sector')
+            result = predict_stock(ticker, sector)
+            
+            return JsonResponse(result)
+
+    return render(request, "invest.html")
 
 
 def detail(request, question_id):

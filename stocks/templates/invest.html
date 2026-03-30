@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Invest{% endblock %}
+
+{% load static %}
+{% block scripts %}
+<script src="{% static 'js/predictor.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <form id="invest-form">
+        {% csrf_token %}
+        <div class="d-flex gap-2 align-items-center">
+            <input type="text" id="ticker_symbol" class="form-control w-50" name="ticker_symbol" placeholder="Ticker">
+
+            <select id="sector" class="form-select w-25" name="sector">
+                <option selected disabled>Sector</option>
+                <option>Tech</option>
+                <option>Health</option>
+                <option>Finance</option>
+                <option>Industry</option>
+                <option>Energy</option>
+                <option>Communication</option>
+                <option>Consumables</option>
+                <option>Materials</option>
+                <option>Services</option>
+                <option>Real Estate</option>
+                <option>Utilities</option> 
+                </select>
+
+            <button type="button" id="submit-btn" class="btn btn-primary w-25">Submit</button>
+        </div>
+    </form>
+
+    <div id="result-container" class="mt-4 text-center" style="display: none;">
+        <div id="alert-box" class="alert">
+            <div id="loading-spinner" class="spinner-border text-primary" role="status" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="result-data"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

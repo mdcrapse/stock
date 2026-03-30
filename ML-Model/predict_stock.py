@@ -76,7 +76,7 @@ if len(close_prices) < 130:
 # Feature engineering
 # ----------------------
 try:
-    current_index = len(close_prices) - 31
+    current_index = len(close_prices) - 1
 
     prices_window = close_prices[current_index-100:current_index]
     current_price = close_prices[current_index]

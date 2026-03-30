@@ -56,7 +56,7 @@ def predict_stock(ticker_name, ticker_type):
         return {"error": "Not enough data"}
 
     try:
-        current_index = len(close_prices) - 31
+        current_index = len(close_prices) - 1
         prices_window = close_prices[current_index-100:current_index]
         current_price = close_prices[current_index]
 
@@ -87,12 +87,15 @@ def predict_stock(ticker_name, ticker_type):
         predicted_return = model.predict(new_df)[0]
         predicted_price = current_price * (1 + predicted_return)
 
+        price_history = [round(float(p), 2) for p in close_prices]
+
         return {
             "ticker": ticker_name,
             "sector": ticker_type,
             "current_price": round(float(current_price), 2),
             "predicted_return": round(float(predicted_return), 3),
-            "predicted_price": round(float(predicted_price), 2)
+            "predicted_price": round(float(predicted_price), 2),
+            "history": price_history, 
         }
 
     except Exception as e:

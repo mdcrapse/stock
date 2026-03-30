@@ -5,6 +5,7 @@
 {% load static %}
 {% block scripts %}
 <script src="{% static 'js/predictor.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -32,6 +33,12 @@
             <button type="button" id="submit-btn" class="btn btn-primary w-25">Submit</button>
         </div>
     </form>
+
+    <div class="row mt-5">
+        <div class="col-12" style="position: relative; height:40vh; width:80vw; margin: auto;">
+            <canvas id="stockChart"></canvas>
+        </div>
+    </div>
 
     <div id="result-container" class="mt-4 text-center" style="display: none;">
         <div id="alert-box" class="alert">

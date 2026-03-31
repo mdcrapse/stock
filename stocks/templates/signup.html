@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4">Sign Up</h1>
+        <p class="lead">Already have an account? <a href="{% url 'login' %}">Log in!</a></p>
+        <form>
+        <div class="form-group">
+            <label for="emailAddress">Email address</label>
+            <input type="email" class="form-control" id="emailAddress" placeholder="Email" required>
+        </div>
+        <br>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" placeholder="Username" required>
+        </div>
+        <br>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Password" required>
+        </div>
+        <br>
+
+        <div class="form-group">
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" class="form-control" id="confirm-password" placeholder="Confirm Password" required>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

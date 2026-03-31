@@ -46,6 +46,7 @@ document.getElementById('submit-btn').addEventListener('click', function(){
                 <p>Current Price: $${data.current_price}</p>
                 <p>Predicted Return (30d): ${data.predicted_return}</p>
                 <p>Predicted Price: $${data.predicted_price}</p>
+                <button type="button" id="submit-btn" class="btn btn-primary w-25">Invest</button>
             `;
         }
         updateChart(data);
@@ -58,27 +59,27 @@ document.getElementById('submit-btn').addEventListener('click', function(){
 });
 
 function updateChart(data) {
+    const wrapper = document.getElementById('chartWrapper');
+    wrapper.style.display = 'block';
+
     const ctx = document.getElementById('stockChart').getContext('2d');
     
     if (stockChart) {
         stockChart.destroy();
     }
 
-    const history = data.history; // Assume this is ~200 points
+    const history = data.history;
     const predictedPrice = data.predicted_price;
     const currentPrice = data.current_price;
     
-    // 1. Create labels for History + 30 days of Future
+    // Label the days
     const labels = history.map((_, i) => `Day ${i}`);
     for (let i = 1; i <= 30; i++) {
-        labels.push(i === 30 ? "30-Day Forecast" : ""); // Only label the final day
+        labels.push(i === 30 ? "30-Day Forecast" : "");
     }
 
-    // 2. Prepare the Prediction Dataset
-    // We start with nulls for all historical points EXCEPT the very last one
     const predictionData = new Array(history.length - 1).fill(null);
     
-    // Anchor point: Today's Price
     predictionData.push(currentPrice); 
     
     // Pad with 29 nulls to represent the 29 days of "waiting"
@@ -86,7 +87,6 @@ function updateChart(data) {
         predictionData.push(null);
     }
     
-    // Final point: The 30th day prediction
     predictionData.push(predictedPrice);
 
     // Color logic
@@ -114,7 +114,7 @@ function updateChart(data) {
                     borderWidth: 2,
                     pointRadius: (ctx) => (ctx.dataIndex === predictionData.length - 1 ? 6 : 0), // Only show dot on the last day
                     pointBackgroundColor: predictionColor,
-                    spanGaps: true // CRITICAL: This connects the "Current Price" to the "Predicted Price" across the nulls
+                    spanGaps: true
                 }
             ]
         },
@@ -123,7 +123,7 @@ function updateChart(data) {
             maintainAspectRatio: false,
             scales: {
                 x: {
-                    display: true, // Turn this on to see the "Forecast" label at the end
+                    display: true,
                     ticks: {
                         maxRotation: 0,
                         autoSkip: true

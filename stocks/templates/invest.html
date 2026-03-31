@@ -9,6 +9,14 @@
 {% endblock %}
 
 {% block content %}
+
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4">Invest!</h1>
+        <p class="lead">Start investing in the market.</p>
+    </div>
+</div>
+
 <div class="row">
     <form id="invest-form">
         {% csrf_token %}
@@ -34,7 +42,7 @@
         </div>
     </form>
 
-    <div class="row mt-5">
+    <div id="chartWrapper" class="row mt-5" style="display: none;">
         <div class="col-12" style="position: relative; height:40vh; width:80vw; margin: auto;">
             <canvas id="stockChart"></canvas>
         </div>

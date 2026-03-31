@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4">Login</h1>
+        <p class="lead">Don't have an account? <a href="{% url 'signup' %}">Sign up!</a></p>
+        <form>
+        <div class="form-group">
+            <label for="emailAddress">Email address</label>
+            <input type="email" class="form-control" id="emailAddress" placeholder="Enter email" required>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Password" required>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

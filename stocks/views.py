@@ -34,6 +34,36 @@ def invest(request):
 
     return render(request, "invest.html")
 
+def login(request):
+    if request.method == 'POST':
+        pass
+
+    return render(request, "login.html")
+
+def signup(request):
+    if request.method == 'POST':
+        pass
+
+    return render(request, "signup.html")
+
+def teams(request):
+    if(request.method == 'POST'):
+        pass
+
+    return render(request, "teams.html")
+
+def leaderboard(request):
+    if(request.method == 'POST'):
+        pass
+
+    return render(request, "leaderboard.html")
+
+def teamview(request):
+    if(request.method == 'POST'):
+        pass
+
+    return render(request, "teamview.html")
+
 
 def detail(request, question_id):
     question = None # get_object_or_404(Question, pk=question_id)

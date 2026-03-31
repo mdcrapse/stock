@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Team View{% endblock %}
+
+{% load static %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.25.4/graphology.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/2.4.0/sigma.min.js"></script>
+<script src="{% static 'js/teamview.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4">Team View!</h1>
+        <p class="lead">Summary for team \team_name\.</p>
+    </div>
+</div>
+
+<hr>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Members</h5>
+                <p class="card-text">10</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Balance Per Capita</h5>
+                <p class="card-text">$25</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Balance</h5>
+                <p class="card-text">$250</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div id="chartWrapper" class="row mt-5">
+    <div class="col-12" style="height:60vh; width:60vw; margin: auto;">
+        <div id="teamChart" style="height: 100%; width: 100%;"></div>
+    </div>
+</div>
+
+{% endblock %}

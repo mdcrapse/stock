@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Teams{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4">Team Up!</h1>
+        <p class="lead">Join a team to start competing.</p>
+    </div>
+</div>
+
+<div class="row">
+    <form id="invest-form">
+        {% csrf_token %}
+        <div class="d-flex gap-2 align-items-center">
+            <input type="text" id="team_search" class="form-control w-75" name="team_search" placeholder="Team Name">
+            <button type="button" id="submit-btn" class="btn btn-primary w-25">Search</button>
+        </div>
+    </form>
+</div>
+
+<hr>
+
+<div class="row">
+    <table class="table">
+    <thead>
+        <tr>
+        <th scope="col">Team Name</th>
+        <th scope="col"># of Members</th>
+        <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Team 1</td>
+            <td>10</td>
+            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
+        </tr>
+        <tr>
+            <td>Team 2</td>
+            <td>13</td>
+            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
+        </tr>
+        <tr>
+            <td>Team 3</td>
+            <td>2</td>
+            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
+        </tr>
+        <tr>
+            <td>Team 4</td>
+            <td>1</td>
+            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
+        </tr>
+        <tr>
+            <td>Team 5</td>
+            <td>7</td>
+            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
+        </tr>
+    </tbody>
+    </table>
+</div>
+
+{% endblock %}

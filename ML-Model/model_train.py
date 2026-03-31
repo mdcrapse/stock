@@ -9,6 +9,9 @@ from sklearn.metrics import mean_absolute_error
 # Load data
 df = pd.read_csv("./data_processed.csv")
 
+df = df.replace([np.inf, -np.inf], np.nan) # Convert inf to NaN
+df = df.dropna(subset=['Target_30Day'])    # Drop rows where target is missing
+
 # Features and target
 X = df.drop(columns=['Target_30Day'])
 y = df['Target_30Day']
@@ -60,3 +63,4 @@ print(f"Test MAE: {mae:.4f}")
 
 # Save model
 joblib.dump(best_model, "./model.pkl")
+joblib.dump(best_model, "../stocks/model.pkl")

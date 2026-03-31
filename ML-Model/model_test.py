@@ -4,76 +4,72 @@ import xgboost as xgb
 import joblib
 import yfinance as yf
 
-#tickers_list = {
-#    "SAP": "Tech", 
-#    "MSFT": "Tech",
-#    "IBM": "Tech",
-#    "NVDA": "Tech",
-#    "AAPL": "Tech",
-#
-#    "VRTX": "Health",
-#    "ABT": "Health",
-#    "TAK": "Health",
-#    "ISRG": "Health",
-#    "HCA": "Health",
-#
-#    "HDB": "Finance",
-#    "XXI": "Finance",
-#    "BLK": "Finance",
-#    "MS": "Finance",
-#    "V": "Finance",
-#
-#    "GE": "Industry",
-#    "GEV": "Industry",
-#    "PWR": "Industry",
-#    "VRT": "Industry",
-#    "CTAS": "Industry",
-#
-#    "COP": "Energy",
-#    "ENB": "Energy",
-#    "SLB": "Energy",
-#    "VLO": "Energy",
-#    "XOM": "Energy",
-#
-#    "GOOGL": "Communication",
-#    "AMX": "Communication",
-#    "NFLX": "Communication",
-#    "APP": "Communication",
-#    "NTES": "Communication",
-#
-#    "KHC": "Consumables",
-#    "EDU": "Consumables",
-#    "PG": "Consumables",
-#    "ADM": "Consumables",
-#    "KO": "Consumables",
-#
-#    "LIN": "Materials",
-#    "NEM": "Materials",
-#    "BHP": "Materials",
-#    "MT": "Materials",
-#    "DOW": "Materials",
-#
-#    "ORLY": "Services",
-#    "MCD": "Services",
-#    "CASY": "Services",
-#    "AMZN": "Services",
-#    "SGI": "Services",
-#
-#    "CBRE": "Real_Estate",
-#    "NLY": "Real_Estate",
-#    "SPG": "Real_Estate",
-#    "AVB": "Real_Estate",
-#    "ARE": "Real_Estate",
-#
-#    "NEE": "Utilities",
-#    "AXIA": "Utilities",
-#    "ATO": "Utilities",
-#    "AWK": "Utilities",
-#    "SRE": "Utilities"
-#    }
-
 tickers_list = {
-    "AMD": "Tech"
+    "SAP": "Tech", 
+    "MSFT": "Tech",
+    "IBM": "Tech",
+    "NVDA": "Tech",
+    "AAPL": "Tech",
+
+    "VRTX": "Health",
+    "ABT": "Health",
+    "TAK": "Health",
+    "ISRG": "Health",
+    "HCA": "Health",
+
+    "HDB": "Finance",
+    "XXI": "Finance",
+    "BLK": "Finance",
+    "MS": "Finance",
+    "V": "Finance",
+
+    "GE": "Industry",
+    "GEV": "Industry",
+    "PWR": "Industry",
+    "VRT": "Industry",
+    "CTAS": "Industry",
+
+    "COP": "Energy",
+    "ENB": "Energy",
+    "SLB": "Energy",
+    "VLO": "Energy",
+    "XOM": "Energy",
+
+    "GOOGL": "Communication",
+    "AMX": "Communication",
+    "NFLX": "Communication",
+    "APP": "Communication",
+    "NTES": "Communication",
+
+    "KHC": "Consumables",
+    "EDU": "Consumables",
+    "PG": "Consumables",
+    "ADM": "Consumables",
+    "KO": "Consumables",
+
+    "LIN": "Materials",
+    "NEM": "Materials",
+    "BHP": "Materials",
+    "MT": "Materials",
+    "DOW": "Materials",
+
+    "ORLY": "Services",
+    "MCD": "Services",
+    "CASY": "Services",
+    "AMZN": "Services",
+    "SGI": "Services",
+
+    "CBRE": "Real_Estate",
+    "NLY": "Real_Estate",
+    "SPG": "Real_Estate",
+    "AVB": "Real_Estate",
+    "ARE": "Real_Estate",
+
+    "NEE": "Utilities",
+    "AXIA": "Utilities",
+    "ATO": "Utilities",
+    "AWK": "Utilities",
+    "SRE": "Utilities"
 }
 
 train_df = pd.read_csv("./data_processed.csv")

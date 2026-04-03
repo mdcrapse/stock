@@ -2,12 +2,12 @@
 \contentsline {section}{\numberline {2}System Design}{2}{}%
 \contentsline {subsection}{\numberline {2.1}Database}{2}{}%
 \contentsline {subsection}{\numberline {2.2}Backend}{2}{}%
-\contentsline {subsection}{\numberline {2.3}Frontent}{2}{}%
+\contentsline {subsection}{\numberline {2.3}Frontend}{2}{}%
 \contentsline {subsection}{\numberline {2.4}Stock Predictor}{3}{}%
 \contentsline {section}{\numberline {3}Functional Components}{3}{}%
 \contentsline {subsection}{\numberline {3.1}Database}{3}{}%
 \contentsline {subsection}{\numberline {3.2}Backend}{3}{}%
-\contentsline {subsection}{\numberline {3.3}Frontent}{3}{}%
+\contentsline {subsection}{\numberline {3.3}Frontend}{3}{}%
 \contentsline {subsection}{\numberline {3.4}User Login}{3}{}%
 \contentsline {subsection}{\numberline {3.5}Stock Predictor}{3}{}%
 \contentsline {subsection}{\numberline {3.6}Leaderboards}{3}{}%

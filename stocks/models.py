@@ -12,7 +12,7 @@ class User(AbstractUser):
     # username from `AbstractUser`
     # password from `AbstractUser`
     # email from `AbstractUser`
-    balance = models.IntegerField(default=0) # balance in cents
+    balance = models.IntegerField(default=10_000*100) # balance in cents (default to $10,000.00)
 
 
 class Stock(models.Model):

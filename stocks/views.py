@@ -1,11 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout
 from django.http import HttpResponse
 from .predictor import predict_stock
 import json
 from django.http import JsonResponse
-
-# from .models import Question
-
+from .forms import SignUpForm, SignInForm
 
 def index(request):
     latest_question_list = [] # Question.objects.order_by("-pub_date")[:5]
@@ -34,17 +33,26 @@ def invest(request):
 
     return render(request, "invest.html")
 
-def login(request):
-    if request.method == 'POST':
-        pass
+def login_view(request):
+    form = SignInForm(request, data=request.POST if request.method == 'POST' else None)
+    if form.is_valid():
+        login(request, form.get_user())
+        return redirect('home')
 
-    return render(request, "login.html")
+    return render(request, 'login.html', {'form': form})
 
-def signup(request):
-    if request.method == 'POST':
-        pass
+def signup_view(request):
+    form = SignUpForm(data=request.POST if request.method == 'POST' else None)
+    if form.is_valid():
+        user = form.save()
+        login(request, user)
+        return redirect('home')
 
-    return render(request, "signup.html")
+    return render(request, 'signup.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
 
 def teams(request):
     if(request.method == 'POST'):
@@ -63,17 +71,3 @@ def teamview(request):
         pass
 
     return render(request, "teamview.html")
-
-
-def detail(request, question_id):
-    question = None # get_object_or_404(Question, pk=question_id)
-    return render(request, "stocks/detail.html", {"question": question})
-
-
-def results(request, question_id):
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % question_id)
-
-
-def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)

@@ -40,7 +40,7 @@ class Owns(models.Model):
 
 
 class Team(models.Model):
-    team_name = models.CharField(max_length=50)
+    team_name = models.CharField(max_length=50, unique=True)
     creation_date = models.DateField()
     balance_per_capita = models.IntegerField()
 

@@ -45,6 +45,12 @@ class Team(models.Model):
     balance_per_capita = models.IntegerField()
 
 
+# Maps users to teams they are members of.
+class Member(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+
+
 # History of a stock.
 # This is used to cach information from other APIs to avoid spamming them.
 class StockHistory(models.Model):

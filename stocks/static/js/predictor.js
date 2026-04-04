@@ -46,7 +46,10 @@ document.getElementById('submit-btn').addEventListener('click', function(){
                 <p>Current Price: $${data.current_price}</p>
                 <p>Predicted Return (30d): ${data.predicted_return}</p>
                 <p>Predicted Price: $${data.predicted_price}</p>
-                <button type="button" id="submit-btn" class="btn btn-primary w-25">Invest</button>
+                <div class="d-flex gap-2 align-items-center justify-content-center">
+                    <input type="number" id="num-stocks" class="form-control w-25" placeholder="Amount to Purchase"></input>
+                    <button type="button" id="invest-btn" class="btn btn-primary w-25" onclick="validateInvestmentAmount(${data.current_price}, '${data.ticker}')">Invest</button>
+                </div>
             `;
         }
         updateChart(data);
@@ -57,6 +60,70 @@ document.getElementById('submit-btn').addEventListener('click', function(){
         console.error('Error:', error);
     });
 });
+
+async function validateInvestmentAmount(curPrice, ticker) {
+    const numStocks = document.getElementById('num-stocks').value;
+    const totalInvestmentCost = numStocks * curPrice;
+
+    // Wait for the balance fetch to finish
+    const response = await fetch('/user/get_balance/');
+    const data = await response.json();
+    const userBalance = data.balance;
+
+    // Unhappy path, alert the user that they don't have sufficient funds
+    if (totalInvestmentCost > userBalance) {
+        alert("Insuificient funds.");
+        return;
+    }
+
+    // Happy path, process the investment
+    processInvestment(numStocks, ticker, curPrice);
+}
+
+function processInvestment(numStocks, ticker, curPrice) {
+    const alertBox = document.getElementById('alert-box');
+    const resultData = document.getElementById('result-data');
+    
+    // Get CSRF token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Perform the fetch
+    fetch('/user/invest/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            symbol: ticker,
+            amount: numStocks,
+            total_price: numStocks * curPrice
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.error) {
+            alertBox.className = 'alert alert-danger';
+            resultData.innerHTML = data.error;
+        } else {
+            if(data.predicted_return > 0)
+            {
+                alertBox.className = 'alert alert-success';
+            } else if(data.predicted_return <= 0){
+                alertBox.className = 'alert alert-warning';
+            }
+            resultData.innerHTML = `
+                <p><strong>Successfully invested in ${numStocks} share(s) of ${ticker} at $${curPrice} each, for a total of ${numStocks * curPrice}.</strong></p>
+            `;
+        }
+    })
+    .catch(error => {
+        alertBox.className = 'alert alert-danger';
+        resultData.innerHTML = 'An error occured. Please try again.';
+        console.error('Error:', error);
+    });
+}
 
 function updateChart(data) {
     const wrapper = document.getElementById('chartWrapper');

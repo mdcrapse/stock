@@ -14,4 +14,6 @@ urlpatterns = [
     path("teams/", views.teams, name="teams"),
     path("leaderboard/", views.leaderboard, name="leaderboard"),
     path("teamview/<str:team_name>/", views.teamview, name="teamview"),
+    path("user/get_balance/", views.getUserBalance, name="getuserbalance"),
+    path("user/invest/", views.investInStock, name="investinstock"),
 ]

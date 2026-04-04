@@ -38,6 +38,9 @@ class Owns(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
 
+    class Meta:
+            unique_together = ('user', 'stock')
+
 
 class Team(models.Model):
     team_name = models.CharField(max_length=50, unique=True)

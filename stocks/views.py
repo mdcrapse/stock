@@ -114,6 +114,9 @@ def investInStock(request: HttpRequest) -> JsonResponse:
         amount = data.get("amount")
         total_price = data.get("total_price")
 
+        if(not ticker_symbol or not amount or not total_price):
+            return JsonResponse({'error': 'Something went wrong'}, status=400)
+
         # Create a new transaction
         new_transaction = Transaction(
             ticker=ticker_symbol,

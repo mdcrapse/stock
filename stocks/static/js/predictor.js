@@ -48,7 +48,7 @@ document.getElementById('submit-btn').addEventListener('click', function(){
                 <p>Predicted Price: $${data.predicted_price}</p>
                 <div class="d-flex gap-2 align-items-center justify-content-center">
                     <input type="number" id="num-stocks" class="form-control w-25" placeholder="Amount to Purchase"></input>
-                    <button type="button" id="invest-btn" class="btn btn-primary w-25" onclick="validateInvestmentAmount(${data.current_price}, '${data.ticker}')">Invest</button>
+                    <button type="button" id="invest-btn" class="btn btn-primary w-25" onclick="validateInvestmentAmount(${data.current_price}, '${data.ticker}', '${data.sector}', ${data.predicted_return}, ${data.predicted_price})">Invest</button>
                 </div>
             `;
         }
@@ -61,7 +61,9 @@ document.getElementById('submit-btn').addEventListener('click', function(){
     });
 });
 
-async function validateInvestmentAmount(curPrice, ticker) {
+async function validateInvestmentAmount(curPrice, ticker, sector, predicted_return, predicted_price) {
+    const alertBox = document.getElementById('alert-box');
+    const resultData = document.getElementById('result-data');
     const numStocks = document.getElementById('num-stocks').value;
     const totalInvestmentCost = numStocks * curPrice;
 
@@ -72,15 +74,16 @@ async function validateInvestmentAmount(curPrice, ticker) {
 
     // Unhappy path, alert the user that they don't have sufficient funds
     if (totalInvestmentCost > userBalance) {
-        alert("Insuificient funds.");
+        alertBox.className = 'alert alert-danger';
+        resultData.innerHTML = 'Insufficient funds!';
         return;
     }
 
     // Happy path, process the investment
-    processInvestment(numStocks, ticker, curPrice);
+    processInvestment(numStocks, ticker, curPrice, sector, predicted_return, predicted_price);
 }
 
-function processInvestment(numStocks, ticker, curPrice) {
+function processInvestment(numStocks, ticker, curPrice, sector, predicted_return, predicted_price) {
     const alertBox = document.getElementById('alert-box');
     const resultData = document.getElementById('result-data');
     
@@ -114,6 +117,14 @@ function processInvestment(numStocks, ticker, curPrice) {
                 alertBox.className = 'alert alert-warning';
             }
             resultData.innerHTML = `
+                <p><strong>${ticker}</strong> (${sector})</p>
+                <p>Current Price: $${curPrice}</p>
+                <p>Predicted Return (30d): ${predicted_return}</p>
+                <p>Predicted Price: $${predicted_price}</p>
+                <div class="d-flex gap-2 align-items-center justify-content-center">
+                    <input type="number" id="num-stocks" class="form-control w-25" placeholder="Amount to Purchase"></input>
+                    <button type="button" id="invest-btn" class="btn btn-primary w-25" onclick="validateInvestmentAmount(${curPrice}, '${ticker}', '${sector}', ${predicted_return}, ${predicted_price})">Invest</button>
+                </div>
                 <p><strong>Successfully invested in ${numStocks} share(s) of ${ticker} at $${curPrice} each, for a total of ${numStocks * curPrice}.</strong></p>
             `;
         }

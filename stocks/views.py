@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from .predictor import predict_stock
 import json
-from django.http import JsonResponse
 from .forms import SignUpForm, SignInForm
 from .models import Team, Member
+from django.db.models import Sum
 
 def index(request: HttpRequest) -> HttpResponse:
     latest_question_list = [] # Question.objects.order_by("-pub_date")[:5]
@@ -79,8 +79,13 @@ def leaderboard(request: HttpRequest) -> HttpResponse:
     
     return render(request, "leaderboard.html", {'teams': view_teams})
 
-def teamview(request):
-    if(request.method == 'POST'):
-        pass
-
-    return render(request, "teamview.html")
+def teamview(request: HttpRequest, team_name: str):
+    team = get_object_or_404(Team, team_name__iexact=team_name)
+    members = Member.objects.filter(team=team)
+    total_balance = members.aggregate(total=Sum('user__balance'))['total'] or 0
+    return render(request, "teamview.html", {
+        'team_name': team.team_name,
+        'num_members': members.count(),
+        'balance_per_capita': team.balance_per_capita,
+        'total_balance': total_balance,
+    })

@@ -13,5 +13,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path("teams/", views.teams, name="teams"),
     path("leaderboard/", views.leaderboard, name="leaderboard"),
-    path("teamview/", views.teamview, name="teamview"),
+    path("teamview/<str:team_name>/", views.teamview, name="teamview"),
 ]

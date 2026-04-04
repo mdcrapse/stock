@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{username}}'s Portfolio{% endblock %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+    <h1 class="mx-auto text-center">{{username}}'s Portfolio!</h1>
+</div>
+
+<hr>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Balance</h5>
+                <p class="card-text">${{balance}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Stocks Owned</h5>
+                <p class="card-text">{{num_stocks}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Shares Owned</h5>
+                <p class="card-text">{{num_shares}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Stock Value</h5>
+                <p class="card-text">${{total_stock_value}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2 class="row mx-auto text-center">Teams</h2>
+
+<div class="row">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for name in team_names %}
+            <tr>
+                <td>{{name}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2 class="row mx-auto text-center">Owned Stocks</h2>
+
+<div class="row">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Ticker</th>
+                <th scope="col">Shares</th>
+                <th scope="col">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in stocks %}
+            <tr>
+                <td>{{stock.ticker}}</td>
+                <td>{{stock.shares}}</td>
+                <td>${{stock.value}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2 class="row mx-auto text-center">Purchase History</h2>
+
+<div class="row">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Ticker</th>
+                <th scope="col">Shares</th>
+                <th scope="col">Purchase Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{transaction.ticker}}</td>
+                <td>{{transaction.shares}}</td>
+                <td>{{transaction.date}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

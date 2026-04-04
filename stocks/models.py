@@ -23,7 +23,7 @@ class Stock(models.Model):
 
 class Transaction(models.Model):
     date = models.DateTimeField()
-    amount = models.IntegerField() # percent of product purchased
+    shares = models.IntegerField()
     ticker = models.CharField(max_length=5)
 
 

@@ -94,6 +94,24 @@ def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
         'total_balance': total_balance,
     })
 
+def portfolio(request: HttpRequest, username: str) -> HttpResponse:
+    user = get_object_or_404(User, username__iexact=username)
+    stocks = Stock.objects.filter(owns__user=user)
+    transactions = Transaction.objects.filter(transactionhistory__user=user)
+    teams = Member.objects.filter(user=user)
+    team_names = teams.values_list('team__team_name', flat=True)
+
+    return render(request, "portfolio.html", {
+        'username': user.username,
+        'balance': user.balance,
+        'num_stocks': stocks.count(),
+        'num_shares': stocks.aggregate(total=Sum('shares'))['total'] or 0,
+        'total_stock_value': stocks.aggregate(total=Sum('value'))['total'] or 0,
+        'team_names': team_names,
+        'stocks': stocks,
+        'transactions': transactions,
+    })
+
 @require_http_methods(["GET"])
 def getUserBalance(request: HttpRequest) -> JsonResponse:
     username = request.user.username
@@ -111,17 +129,17 @@ def investInStock(request: HttpRequest) -> JsonResponse:
         
         # Access the keys
         ticker_symbol = data.get("symbol")
-        amount = data.get("amount")
+        shares = data.get("amount")
         total_price = data.get("total_price")
 
-        if(not ticker_symbol or not amount or not total_price):
+        if(not ticker_symbol or not shares or not total_price):
             return JsonResponse({'error': 'Something went wrong'}, status=400)
 
         # Create a new transaction
         new_transaction = Transaction(
             ticker=ticker_symbol,
             date=datetime.datetime.now(),
-            amount=amount
+            shares=shares
         )
         new_transaction.save()
         
@@ -140,14 +158,14 @@ def investInStock(request: HttpRequest) -> JsonResponse:
         for entry in user_portfolio:
             if(entry.stock.ticker == ticker_symbol):
                 found_stock = True
-                entry.stock.shares += int(amount)
+                entry.stock.shares += int(shares)
                 entry.stock.save()
                 break
 
         if(found_stock == False):
             # If they dont have the stock, create a new stock entry
             new_stock = Stock(
-                shares=amount,
+                shares=shares,
                 ticker=ticker_symbol,
                 value=total_price
             )
@@ -160,7 +178,7 @@ def investInStock(request: HttpRequest) -> JsonResponse:
             )
             new_owns.save()
 
-        # Take away that amount of money from the user
+        # Take away that shares of money from the user
         request.user.balance -= (total_price * 100) # multiply to account for dollars -> cents
         request.user.save()
 

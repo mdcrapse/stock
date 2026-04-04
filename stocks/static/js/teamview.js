@@ -1,8 +1,11 @@
-document.addEventListener("DOMContentLoaded", function () {
+// Expects `member_names` to exist in the global context.
+// This is done to avoid needing to request the names after the webpage is loaded.
+// `member_names` should be an array of strings.
+document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("teamChart");
   const graph = new graphology.Graph();
 
-  // 1. Create central team node
+  // Create central team node
   graph.addNode("team_root", {
     label: "Team",
     x: 0,
@@ -13,12 +16,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /**
    * Adds a certain amount of nodes around the center node
-   * @param {number} count - Number of user nodes to add
+   * @param {string[]} names - User node names to add
    * @param {number} radius - Distance from the center
    */
-  function populateTeam(count, radius = 10) {
-    for (let i = 0; i < count; i++) {
-      const nodeId = `user_${i}`;
+  function populateTeam(names, radius = 10) {
+    const count = names.length;
+    let i = 0;
+    for (const name of names) {
+      const nodeId = name;
       const angle = (i * 2 * Math.PI) / count;
 
       const posX = radius * Math.cos(angle);
@@ -26,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Add User Node
       graph.addNode(nodeId, {
-        label: `User ${i + 1}`,
+        label: name,
         x: posX,
         y: posY,
         size: 12,
@@ -38,19 +43,21 @@ document.addEventListener("DOMContentLoaded", function () {
         size: 2,
         color: "#ced4da",
       });
+
+      i++;
     }
   }
 
-  // 2. Populate the graph
-  populateTeam(12, 5);
+  // Populate the graph
+  populateTeam(member_names, 5);
 
-  // 3. Render via Sigma
+  // Render via Sigma
   const sigmaInstance = new Sigma(graph, container, {
     renderLabels: true,
     labelSize: 14,
   });
 
-  // 4. Show the wrapper
+  // Show the wrapper
   const wrapper = document.getElementById("chartWrapper");
   if (wrapper) {
     wrapper.style.display = "block";

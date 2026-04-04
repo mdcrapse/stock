@@ -79,13 +79,15 @@ def leaderboard(request: HttpRequest) -> HttpResponse:
     
     return render(request, "leaderboard.html", {'teams': view_teams})
 
-def teamview(request: HttpRequest, team_name: str):
+def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
     team = get_object_or_404(Team, team_name__iexact=team_name)
     members = Member.objects.filter(team=team)
+    names = list(members.values_list('user__username', flat=True))
     total_balance = members.aggregate(total=Sum('user__balance'))['total'] or 0
     return render(request, "teamview.html", {
         'team_name': team.team_name,
         'num_members': members.count(),
+        'member_names': names,
         'balance_per_capita': team.balance_per_capita,
         'total_balance': total_balance,
     })

@@ -6,6 +6,13 @@
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.25.4/graphology.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/2.4.0/sigma.min.js"></script>
+
+<!-- This safely outputs the data as a JSON script tag -->
+{{ member_names|json_script:"member-names-data" }}
+<script>
+    const member_names = JSON.parse(document.getElementById('member-names-data').textContent);
+</script>
+
 <script src="{% static 'js/teamview.js' %}"></script>
 {% endblock %}
 

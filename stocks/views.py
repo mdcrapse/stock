@@ -1,27 +1,28 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from .predictor import predict_stock
 import json
 from django.http import JsonResponse
 from .forms import SignUpForm, SignInForm
+from .models import Team, Member
 
-def index(request):
+def index(request: HttpRequest) -> HttpResponse:
     latest_question_list = [] # Question.objects.order_by("-pub_date")[:5]
     context = {"latest_question_list": latest_question_list}
     return render(request, "stocks/index.html", context)
 
 
-def home(request):
+def home(request: HttpRequest) -> HttpResponse:
     return render(request, "home.html")
 
-def about(request):
+def about(request: HttpRequest) -> HttpResponse:
     return render(request, "about.html")
 
-def contact(request):
+def contact(request: HttpRequest) -> HttpResponse:
     return render(request, "contact.html")
 
-def invest(request):
+def invest(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
             # Check if the request is JSON
             data = json.loads(request.body)
@@ -33,7 +34,7 @@ def invest(request):
 
     return render(request, "invest.html")
 
-def login_view(request):
+def login_view(request: HttpRequest) -> HttpResponse:
     form = SignInForm(request, data=request.POST if request.method == 'POST' else None)
     if form.is_valid():
         login(request, form.get_user())
@@ -41,7 +42,7 @@ def login_view(request):
 
     return render(request, 'login.html', {'form': form})
 
-def signup_view(request):
+def signup_view(request: HttpRequest) -> HttpResponse:
     form = SignUpForm(data=request.POST if request.method == 'POST' else None)
     if form.is_valid():
         user = form.save()
@@ -50,21 +51,33 @@ def signup_view(request):
 
     return render(request, 'signup.html', {'form': form})
 
-def logout_view(request):
+def logout_view(request: HttpRequest) -> HttpResponse:
     logout(request)
     return redirect('login')
 
-def teams(request):
+def teams(request: HttpRequest) -> HttpResponse:
     if(request.method == 'POST'):
         pass
 
     return render(request, "teams.html")
 
-def leaderboard(request):
+def leaderboard(request: HttpRequest) -> HttpResponse:
+    teams = []
     if(request.method == 'POST'):
-        pass
+        search = request.POST.get('search')
+        teams = Team.objects.filter(team_name__icontains=search).order_by('-balance_per_capita')
+    else:
+        teams = Team.objects.order_by('-balance_per_capita')[:10]
 
-    return render(request, "leaderboard.html")
+    view_teams = []
+    for t in teams:
+        view_teams.append({
+            'team_name': t.team_name,
+            'num_members': Member.objects.filter(team=t).count(),
+            'balance_per_capita': t.balance_per_capita,
+        })
+    
+    return render(request, "leaderboard.html", {'teams': view_teams})
 
 def teamview(request):
     if(request.method == 'POST'):

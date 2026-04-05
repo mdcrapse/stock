@@ -97,13 +97,13 @@ def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
 def portfolio(request: HttpRequest, username: str) -> HttpResponse:
     user = get_object_or_404(User, username__iexact=username)
     stocks = Stock.objects.filter(owns__user=user)
-    transactions = Transaction.objects.filter(transactionhistory__user=user)
+    transactions = Transaction.objects.filter(transactionhistory__user=user).order_by('-date')
     teams = Member.objects.filter(user=user)
     team_names = teams.values_list('team__team_name', flat=True)
 
     return render(request, "portfolio.html", {
         'username': user.username,
-        'balance': user.balance,
+        'balance': user.balance / 100.0,
         'num_stocks': stocks.count(),
         'num_shares': stocks.aggregate(total=Sum('shares'))['total'] or 0,
         'total_stock_value': stocks.aggregate(total=Sum('value'))['total'] or 0,

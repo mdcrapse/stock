@@ -13,7 +13,7 @@
 <hr>
 
 <div class="row mt-4">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Balance</h5>
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Stocks Owned</h5>
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Shares Owned</h5>
@@ -39,12 +39,32 @@
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-md-3">
+<div class="row mt-4">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Total Stock Value</h5>
-                <p class="card-text">${{total_stock_value}}</p>
+                <p class="card-text">≈ ${{total_stock_value}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Stock Purchase Costs</h5>
+                <p class="card-text">-${{total_stock_purchase_value}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Stock Value Gain</h5>
+                <p class="card-text">≈ ${{total_value_earned}}</p>
             </div>
         </div>
     </div>
@@ -79,7 +99,9 @@
             <tr>
                 <th scope="col">Ticker</th>
                 <th scope="col">Shares</th>
+                <th scope="col">Cost</th>
                 <th scope="col">Value</th>
+                <th scope="col">Loss/Gain</th>
             </tr>
         </thead>
         <tbody>
@@ -88,6 +110,8 @@
                 <td>{{stock.ticker}}</td>
                 <td>{{stock.shares}}</td>
                 <td>${{stock.value}}</td>
+                <td>≈ ${{stock.actual_value}}</td>
+                <td>≈ ${{stock.value_diff}}</td>
             </tr>
             {% endfor %}
         </tbody>

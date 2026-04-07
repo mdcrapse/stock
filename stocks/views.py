@@ -101,14 +101,28 @@ def portfolio(request: HttpRequest, username: str) -> HttpResponse:
     teams = Member.objects.filter(user=user)
     team_names = teams.values_list('team__team_name', flat=True)
 
+    payed = stocks.aggregate(total=Sum('value'))['total'] or 0
+    tickers = list(stocks.values_list('ticker', 'shares'))
+    stock_prices = _current_stock_price(tickers)
+    current_share_price = sum(stock_prices.values())
+    pay_diff = current_share_price - payed
+
+    stocks_formatted = stocks.values('ticker', 'value', 'shares')
+    for s in stocks_formatted:
+        s['actual_value'] = stock_prices[s['ticker']]
+        s['value_diff'] = f'{s['actual_value'] - s['value']:.2f}'
+        s['actual_value'] = f'{s['actual_value']:.2f}'
+
     return render(request, "portfolio.html", {
         'username': user.username,
         'balance': user.balance / 100.0,
         'num_stocks': stocks.count(),
         'num_shares': stocks.aggregate(total=Sum('shares'))['total'] or 0,
-        'total_stock_value': stocks.aggregate(total=Sum('value'))['total'] or 0,
+        'total_stock_value': f'{current_share_price:.2f}',
+        'total_stock_purchase_value': f'{payed:.2f}',
+        'total_value_earned': f'{pay_diff:.2f}',
         'team_names': team_names,
-        'stocks': stocks,
+        'stocks': stocks_formatted,
         'transactions': transactions,
     })
 
@@ -190,3 +204,8 @@ def investInStock(request: HttpRequest) -> JsonResponse:
     # Return success message
     return JsonResponse({'Success': 200})
 
+# Returns the single share price of the specified tickers.
+def _current_stock_price(tickers: list[tuple[str, int]]) -> dict[str, float]:
+    import yfinance as yf
+    ticker = yf.Tickers(" ".join([t for (t, _) in tickers])).tickers
+    return {t: ticker[t].history(period='1d')['Close'].iloc[0] * s for (t, s) in tickers}

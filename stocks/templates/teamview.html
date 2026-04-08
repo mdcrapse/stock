@@ -22,7 +22,26 @@
     <div class="col-md-8 mx-auto text-center">
         <h1 class="display-4">Team View!</h1>
         <p class="lead">Summary for team - {{team_name}}.</p>
-        <button type="button" id="submit-btn" class="btn btn-primary w-25">Join Team</button>
+
+        {% if user_is_on_team %}
+        <form method="POST" action="{% url 'leaveteam' team_name %}">
+            {% csrf_token %}
+            <button type="submit" id="submit-btn" class="btn btn-warning w-25">Leave Team</button>
+        </form>
+        {% else %}
+        <form method="POST" action="{% url 'jointeam' team_name %}">
+            {% csrf_token %}
+            <button type="submit" id="submit-btn" class="btn btn-primary w-25">Join Team</button>
+        </form>
+        {% endif %}
+        
+        {% if user_owns_team %}
+        <form method="POST" action="{% url 'deleteteam' team_name %}">
+            {% csrf_token %}
+            <button type="submit" id="submit-btn" class="btn btn-error w-25">Delete Team</button>
+        </form>
+        {% endif %}
+
     </div>
 </div>
 
@@ -42,7 +61,7 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Balance Per Capita</h5>
-                <p class="card-text">${{balance_per_capita}}</p>
+                <p class="card-text">${{ balance_per_capita|floatformat:2 }}</p>
             </div>
         </div>
     </div>
@@ -51,7 +70,7 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Total Balance</h5>
-                <p class="card-text">${{total_balance}}</p>
+                <p class="card-text">${{ total_balance|floatformat:2 }}</p>
             </div>
         </div>
     </div>

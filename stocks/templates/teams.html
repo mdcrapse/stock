@@ -47,7 +47,7 @@
             <tr>
                 <td>{{team.team_name}}</td>
                 <td>{{team.num_members}}</td>
-                <td>{{team.balance_per_capita}}</td>
+                <td>{{ team.balance_per_capita|floatformat:2 }}</td>
                 <td><a href="{% url 'teamview' team_name=team.team_name %}" type="button" id="submit-btn" class="btn btn-primary w-100">View</a>
                 </td>
             </tr>

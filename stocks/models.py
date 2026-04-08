@@ -46,6 +46,7 @@ class Team(models.Model):
     team_name = models.CharField(max_length=50, unique=True)
     creation_date = models.DateField()
     balance_per_capita = models.IntegerField()
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 # Maps users to teams they are members of.

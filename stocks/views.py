@@ -80,14 +80,48 @@ def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
     team = get_object_or_404(Team, team_name__iexact=team_name)
     members = Member.objects.filter(team=team)
     names = list(members.values_list('user__username', flat=True))
-    total_balance = members.aggregate(total=Sum('user__balance'))['total'] or 0
+    total_balance = (members.aggregate(total=Sum('user__balance'))['total'] or 0) / 100.0
+    team.balance_per_capita = 0
+    if(members.count() > 0):
+        team.balance_per_capita = total_balance / (members.count())
+
+    team.save()
+
+    user_is_on_team = False
+    if(Member.objects.filter(user=request.user, team=Team.objects.filter(team_name=team_name)[0])):
+        user_is_on_team = True
+
+    user_owns_team = False
+    if(Team.objects.filter(owner=request.user, team_name=team_name)):
+        user_owns_team = True
+
+    print(user_owns_team)
+
     return render(request, "teamview.html", {
         'team_name': team.team_name,
         'num_members': members.count(),
         'member_names': names,
         'balance_per_capita': team.balance_per_capita,
         'total_balance': total_balance,
+        'user_is_on_team': user_is_on_team,
+        'user_owns_team': user_owns_team,
     })
+
+@require_http_methods(['POST'])
+def join_team(request: HttpRequest, team_name: str) -> HttpResponse:
+    new_member = Member(
+        user = request.user,
+        team = Team.objects.filter(team_name=team_name).first()
+    )
+
+    new_member.save()
+    return redirect('teamview', team_name=team_name)
+
+@require_http_methods(['POST'])
+def leave_team(request: HttpRequest, team_name: str) -> HttpResponse:
+    member = Member.objects.filter(user=request.user, team=Team.objects.filter(team_name=team_name).first()).first()
+    member.delete()
+    return redirect('teamview', team_name=team_name)
 
 def add_team(request: HttpResponse) -> HttpResponse:
     data = request.POST
@@ -102,10 +136,24 @@ def add_team(request: HttpResponse) -> HttpResponse:
         new_team = Team(
             team_name=team_name,
             creation_date=datetime.datetime.now(),
-            balance_per_capita=0
+            balance_per_capita=0,
+            owner=request.user,
         )
         new_team.save()
         messages.success(request, "Team added successfully!")
+
+    return redirect('teams')
+
+@require_http_methods(['POST'])
+def delete_team(request: HttpResponse, team_name: str) -> HttpResponse:
+    team = Team.objects.filter(owner=request.user, team_name=team_name).first()
+
+    if(team):
+        team.delete()
+        messages.success(request, "Team deleted successfully!")
+
+    else:
+        messages.success(request, "Error: Try again")
 
     return redirect('teams')
 

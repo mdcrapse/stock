@@ -17,6 +17,15 @@
     {% include "includes/navbar.html" %}
 
     <main class="container mt-4 flex-fill">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
         {% block content %}
         {% endblock %}
     </main>

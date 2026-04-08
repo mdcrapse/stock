@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
+from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from .predictor import predict_stock
 import json
@@ -58,12 +59,6 @@ def logout_view(request: HttpRequest) -> HttpResponse:
     return redirect('login')
 
 def teams(request: HttpRequest) -> HttpResponse:
-    if(request.method == 'POST'):
-        pass
-
-    return render(request, "teams.html")
-
-def leaderboard(request: HttpRequest) -> HttpResponse:
     teams = []
     if(request.method == 'POST'):
         search = request.POST.get('search')
@@ -79,7 +74,7 @@ def leaderboard(request: HttpRequest) -> HttpResponse:
             'balance_per_capita': t.balance_per_capita,
         })
     
-    return render(request, "leaderboard.html", {'teams': view_teams})
+    return render(request, "teams.html", {'teams': view_teams})
 
 def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
     team = get_object_or_404(Team, team_name__iexact=team_name)
@@ -94,6 +89,26 @@ def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
         'total_balance': total_balance,
     })
 
+def add_team(request: HttpResponse) -> HttpResponse:
+    data = request.POST
+    team_name = data.get("team_name")
+
+    # Check that the team doesn't already exist
+    if Team.objects.filter(team_name=team_name).exists():
+        messages.error(request, f"Error: Team {team_name} already exists.")
+
+    # If not, create a new team
+    else:
+        new_team = Team(
+            team_name=team_name,
+            creation_date=datetime.datetime.now(),
+            balance_per_capita=0
+        )
+        new_team.save()
+        messages.success(request, "Team added successfully!")
+
+    return redirect('teams')
+
 def portfolio(request: HttpRequest, username: str) -> HttpResponse:
     user = get_object_or_404(User, username__iexact=username)
     stocks = Stock.objects.filter(owns__user=user)
@@ -101,7 +116,7 @@ def portfolio(request: HttpRequest, username: str) -> HttpResponse:
     teams = Member.objects.filter(user=user)
     team_names = teams.values_list('team__team_name', flat=True)
 
-    payed = stocks.aggregate(total=Sum('value'))['total'] or 0
+    payed = abs(stocks.aggregate(total=Sum('value'))['total'] or 0)
     tickers = list(stocks.values_list('ticker', 'shares'))
     stock_prices = _current_stock_price(tickers)
     current_share_price = sum(stock_prices.values())

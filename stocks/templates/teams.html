@@ -2,21 +2,30 @@
 
 {% block title %}Teams{% endblock %}
 
+{% load static %}
+{% block scripts %}
+{% endblock %}
+
 {% block content %}
 
 <div class="row">
     <div class="col-md-8 mx-auto text-center">
-        <h1 class="display-4">Team Up!</h1>
-        <p class="lead">Join a team to start competing.</p>
+        <h1 class="display-4">Teams!</h1>
+        <p class="lead">View the top teams, ranked by balance per capita.</p>
     </div>
 </div>
 
 <div class="row">
-    <form id="invest-form">
+    <form method="post" id="invest-form">
         {% csrf_token %}
         <div class="d-flex gap-2 align-items-center">
-            <input type="text" id="team_search" class="form-control w-75" name="team_search" placeholder="Team Name">
-            <button type="button" id="submit-btn" class="btn btn-primary w-25">Search</button>
+            <input type="text" id="search" class="form-control w-50" name="search"
+                placeholder="Team Name">
+
+            <button type="submit" id="submit-btn" class="btn btn-primary w-25">Search</button>
+            <button type="button" class="btn btn-success w-25" data-bs-toggle="modal" data-bs-target="#addTeamModal">
+                Add
+            </button>
         </div>
     </form>
 </div>
@@ -25,41 +34,49 @@
 
 <div class="row">
     <table class="table">
-    <thead>
-        <tr>
-        <th scope="col">Team Name</th>
-        <th scope="col"># of Members</th>
-        <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Team 1</td>
-            <td>10</td>
-            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
-        </tr>
-        <tr>
-            <td>Team 2</td>
-            <td>13</td>
-            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
-        </tr>
-        <tr>
-            <td>Team 3</td>
-            <td>2</td>
-            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
-        </tr>
-        <tr>
-            <td>Team 4</td>
-            <td>1</td>
-            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
-        </tr>
-        <tr>
-            <td>Team 5</td>
-            <td>7</td>
-            <td><button type="button" id="submit-btn" class="btn btn-primary w-100">Join</button></td>
-        </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th scope="col">Team Name</th>
+                <th scope="col"># of Members</th>
+                <th scope="col">$ / Capita</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+            <tr>
+                <td>{{team.team_name}}</td>
+                <td>{{team.num_members}}</td>
+                <td>{{team.balance_per_capita}}</td>
+                <td><a href="{% url 'teamview' team_name=team.team_name %}" type="button" id="submit-btn" class="btn btn-primary w-100">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </div>
 
+<div class="modal fade" id="addTeamModal" tabindex="-1" aria-labelledby="addTeamModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTeamModalLabel">Add New Team</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'addteam' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="team_name" class="form-label">Team Name</label>
+            <input type="text" class="form-control" id="team_name" name="team_name" placeholder="e.g. The Coolest Team Ever" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name="add_instrument" class="btn btn-success">Save Team</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}

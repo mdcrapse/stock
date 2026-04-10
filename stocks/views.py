@@ -13,20 +13,12 @@ from .models import Team, Member, Transaction, TransactionHistory, Owns, User, S
 import json
 import datetime
 
-def index(request: HttpRequest) -> HttpResponse:
-    latest_question_list = [] # Question.objects.order_by("-pub_date")[:5]
-    context = {"latest_question_list": latest_question_list}
-    return render(request, "stocks/index.html", context)
-
+# ===============
+# USER INTERFACES
+# ===============
 
 def home(request: HttpRequest) -> HttpResponse:
     return render(request, "home.html")
-
-def about(request: HttpRequest) -> HttpResponse:
-    return render(request, "about.html")
-
-def contact(request: HttpRequest) -> HttpResponse:
-    return render(request, "contact.html")
 
 @login_required()
 def invest(request: HttpRequest) -> HttpResponse:
@@ -125,6 +117,43 @@ def leaderboard(request: HttpRequest) -> HttpResponse:
     return render(request, 'leaderboard.html', {'teams': teams})
 
 @login_required()
+def portfolio(request: HttpRequest, username: str) -> HttpResponse:
+    user = get_object_or_404(User, username__iexact=username)
+    stocks = Stock.objects.filter(owns__user=user)
+    transactions = Transaction.objects.filter(transactionhistory__user=user).order_by('-date')
+    teams = Member.objects.filter(user=user)
+    team_names = teams.values_list('team__team_name', flat=True)
+
+    payed = abs(stocks.aggregate(total=Sum('value'))['total'] or 0)
+    tickers = list(stocks.values_list('ticker', 'shares'))
+    stock_prices = _current_stock_price(tickers)
+    current_share_price = sum(stock_prices.values())
+    pay_diff = current_share_price - payed
+
+    stocks_formatted = stocks.values('ticker', 'value', 'shares')
+    for s in stocks_formatted:
+        s['actual_value'] = stock_prices[s['ticker']]
+        s['value_diff'] = f'{s['actual_value'] - s['value']:.2f}'
+        s['actual_value'] = f'{s['actual_value']:.2f}'
+
+    return render(request, "portfolio.html", {
+        'username': user.username,
+        'balance': user.balance / 100.0,
+        'num_stocks': stocks.count(),
+        'num_shares': stocks.aggregate(total=Sum('shares'))['total'] or 0,
+        'total_stock_value': f'{current_share_price:.2f}',
+        'total_stock_purchase_value': f'{payed:.2f}',
+        'total_value_earned': f'{pay_diff:.2f}',
+        'team_names': team_names,
+        'stocks': stocks_formatted,
+        'transactions': transactions,
+    })
+
+# ==========
+# API ROUTES
+# ==========
+
+@login_required()
 @require_http_methods(['POST'])
 def join_team(request: HttpRequest, team_name: str) -> HttpResponse:
     new_member = Member(
@@ -178,39 +207,6 @@ def delete_team(request: HttpResponse, team_name: str) -> HttpResponse:
         messages.success(request, "Error: Try again")
 
     return redirect('teams')
-
-@login_required()
-def portfolio(request: HttpRequest, username: str) -> HttpResponse:
-    user = get_object_or_404(User, username__iexact=username)
-    stocks = Stock.objects.filter(owns__user=user)
-    transactions = Transaction.objects.filter(transactionhistory__user=user).order_by('-date')
-    teams = Member.objects.filter(user=user)
-    team_names = teams.values_list('team__team_name', flat=True)
-
-    payed = abs(stocks.aggregate(total=Sum('value'))['total'] or 0)
-    tickers = list(stocks.values_list('ticker', 'shares'))
-    stock_prices = _current_stock_price(tickers)
-    current_share_price = sum(stock_prices.values())
-    pay_diff = current_share_price - payed
-
-    stocks_formatted = stocks.values('ticker', 'value', 'shares')
-    for s in stocks_formatted:
-        s['actual_value'] = stock_prices[s['ticker']]
-        s['value_diff'] = f'{s['actual_value'] - s['value']:.2f}'
-        s['actual_value'] = f'{s['actual_value']:.2f}'
-
-    return render(request, "portfolio.html", {
-        'username': user.username,
-        'balance': user.balance / 100.0,
-        'num_stocks': stocks.count(),
-        'num_shares': stocks.aggregate(total=Sum('shares'))['total'] or 0,
-        'total_stock_value': f'{current_share_price:.2f}',
-        'total_stock_purchase_value': f'{payed:.2f}',
-        'total_value_earned': f'{pay_diff:.2f}',
-        'team_names': team_names,
-        'stocks': stocks_formatted,
-        'transactions': transactions,
-    })
 
 @login_required()
 @require_http_methods(["GET"])
@@ -291,6 +287,10 @@ def investInStock(request: HttpRequest) -> JsonResponse:
 
     # Return success message
     return JsonResponse({'Success': 200})
+
+# ================
+# HELPER FUNCTIONS
+# ================
 
 # Returns the single share price of the specified tickers.
 def _current_stock_price(tickers: list[tuple[str, int]]) -> dict[str, float]:

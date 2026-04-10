@@ -1,13 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.db.models import Sum, Avg
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+
 from .predictor import predict_stock
-import json
 from .forms import SignUpForm, SignInForm
 from .models import Team, Member, Transaction, TransactionHistory, Owns, User, Stock
-from django.db.models import Sum
-from django.views.decorators.http import require_http_methods
+
+import json
 import datetime
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -25,6 +28,7 @@ def about(request: HttpRequest) -> HttpResponse:
 def contact(request: HttpRequest) -> HttpResponse:
     return render(request, "contact.html")
 
+@login_required()
 def invest(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
             # Check if the request is JSON
@@ -54,10 +58,12 @@ def signup_view(request: HttpRequest) -> HttpResponse:
 
     return render(request, 'signup.html', {'form': form})
 
+@login_required()
 def logout_view(request: HttpRequest) -> HttpResponse:
     logout(request)
     return redirect('login')
 
+@login_required()
 def teams(request: HttpRequest) -> HttpResponse:
     teams = []
     if(request.method == 'POST'):
@@ -76,6 +82,7 @@ def teams(request: HttpRequest) -> HttpResponse:
     
     return render(request, "teams.html", {'teams': view_teams})
 
+@login_required()
 def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
     team = get_object_or_404(Team, team_name__iexact=team_name)
     members = Member.objects.filter(team=team)
@@ -107,9 +114,17 @@ def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
         'user_owns_team': user_owns_team,
     })
 
+@login_required()
 def leaderboard(request: HttpRequest) -> HttpResponse:
-    return render(request, 'leaderboard.html')
+    mean_bpc = 0
+    if(Team.objects.count() > 0):
+        mean_bpc = Team.objects.aggregate(Avg('balance_per_capita')).get('balance_per_capita__avg')
+    
+    teams = Team.objects.filter(balance_per_capita__gte=mean_bpc)
 
+    return render(request, 'leaderboard.html', {'teams': teams})
+
+@login_required()
 @require_http_methods(['POST'])
 def join_team(request: HttpRequest, team_name: str) -> HttpResponse:
     new_member = Member(
@@ -120,12 +135,15 @@ def join_team(request: HttpRequest, team_name: str) -> HttpResponse:
     new_member.save()
     return redirect('teamview', team_name=team_name)
 
+@login_required()
 @require_http_methods(['POST'])
 def leave_team(request: HttpRequest, team_name: str) -> HttpResponse:
     member = Member.objects.filter(user=request.user, team=Team.objects.filter(team_name=team_name).first()).first()
     member.delete()
     return redirect('teamview', team_name=team_name)
 
+@login_required()
+@require_http_methods(['POST'])
 def add_team(request: HttpResponse) -> HttpResponse:
     data = request.POST
     team_name = data.get("team_name")
@@ -147,6 +165,7 @@ def add_team(request: HttpResponse) -> HttpResponse:
 
     return redirect('teams')
 
+@login_required()
 @require_http_methods(['POST'])
 def delete_team(request: HttpResponse, team_name: str) -> HttpResponse:
     team = Team.objects.filter(owner=request.user, team_name=team_name).first()
@@ -160,6 +179,7 @@ def delete_team(request: HttpResponse, team_name: str) -> HttpResponse:
 
     return redirect('teams')
 
+@login_required()
 def portfolio(request: HttpRequest, username: str) -> HttpResponse:
     user = get_object_or_404(User, username__iexact=username)
     stocks = Stock.objects.filter(owns__user=user)
@@ -192,6 +212,7 @@ def portfolio(request: HttpRequest, username: str) -> HttpResponse:
         'transactions': transactions,
     })
 
+@login_required()
 @require_http_methods(["GET"])
 def getUserBalance(request: HttpRequest) -> JsonResponse:
     username = request.user.username
@@ -201,6 +222,7 @@ def getUserBalance(request: HttpRequest) -> JsonResponse:
 
     return JsonResponse({'username': username, 'balance': user_balance})
 
+@login_required()
 @require_http_methods(["POST"])
 def investInStock(request: HttpRequest) -> JsonResponse:
     # Get the data from the POST

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +27,8 @@ SECRET_KEY = 'django-insecure-h_m(sp)2lq(2#hnnunp@6(i#pu#wk4+r)zvp_&9^=^7zcig36k
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+LOGIN_URL = reverse_lazy('login')
 
 
 # Application definition

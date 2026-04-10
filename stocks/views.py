@@ -107,6 +107,9 @@ def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
         'user_owns_team': user_owns_team,
     })
 
+def leaderboard(request: HttpRequest) -> HttpResponse:
+    return render(request, 'leaderboard.html')
+
 @require_http_methods(['POST'])
 def join_team(request: HttpRequest, team_name: str) -> HttpResponse:
     new_member = Member(

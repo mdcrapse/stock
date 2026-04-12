@@ -74,6 +74,7 @@ def teams(request: HttpRequest) -> HttpResponse:
     
     return render(request, "teams.html", {'teams': view_teams})
 
+# Co-author network required query fulfilled here
 @login_required()
 def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
     team = get_object_or_404(Team, team_name__iexact=team_name)
@@ -106,15 +107,28 @@ def teamview(request: HttpRequest, team_name: str) -> HttpResponse:
         'user_owns_team': user_owns_team,
     })
 
+# H-index and Q1 influence network fulfilled here
 @login_required()
 def leaderboard(request: HttpRequest) -> HttpResponse:
     mean_bpc = 0
+
+    # Get the top 5 teams ranked by balance per capita (H -index)
     if(Team.objects.count() > 0):
         mean_bpc = Team.objects.aggregate(Avg('balance_per_capita')).get('balance_per_capita__avg')
     
-    teams = Team.objects.filter(balance_per_capita__gte=mean_bpc)
+    teams = Team.objects.filter(balance_per_capita__gte=mean_bpc).order_by('-balance_per_capita')[:5]
 
-    return render(request, 'leaderboard.html', {'teams': teams})
+    # Get the top 10 stocks out of those top 5 teams ( Q1 influence network)
+    # Get users from teams
+    users = User.objects.filter(member__team__in=teams).distinct()
+
+    # Get the stocks from the users
+    stocks_all = Stock.objects.filter(owns__user__in=users)
+
+    # Do ordering, grouping, and filtering
+    stocks_filtered = stocks_all.values('ticker').annotate(total_shares=Sum('shares')).order_by('-total_shares')[:10]
+
+    return render(request, 'leaderboard.html', {'teams': teams, 'top_stocks': stocks_filtered})
 
 @login_required()
 def portfolio(request: HttpRequest, username: str) -> HttpResponse:
@@ -287,6 +301,38 @@ def investInStock(request: HttpRequest) -> JsonResponse:
 
     # Return success message
     return JsonResponse({'Success': 200})
+
+# Returns a JSON response containing the top 5 stocks from the top 5 teams
+@login_required
+def getTopTeamsAndStocks(request: HttpRequest) -> JsonResponse:
+    mean_bpc = 0
+
+    if(Team.objects.count() > 0):
+        mean_bpc = Team.objects.aggregate(Avg('balance_per_capita')).get('balance_per_capita__avg')
+    
+    teams = Team.objects.filter(balance_per_capita__gte=mean_bpc).order_by('-balance_per_capita')[:5]
+
+    team_stocks = {}
+    # For each team, find the top 5 stocks
+    for team in teams:
+        # Get the users from the team
+        users = User.objects.filter(member__team=team).distinct()
+
+        # Get the stocks from the users
+        stocks_all = Stock.objects.filter(owns__user__in=users)
+
+        # Do ordering, grouping, and filtering
+        stocks_filtered = stocks_all.values('ticker').annotate(total_shares=Sum('shares')).order_by('-total_shares')[:5]
+
+        team_stocks[team.team_name] = []
+
+        for stock in stocks_filtered:
+            team_stocks[team.team_name].append({
+                        'ticker': stock['ticker'],
+                        'total_shares': stock['total_shares']
+                    })            
+
+    return JsonResponse({'team_stocks': team_stocks})
 
 # ================
 # HELPER FUNCTIONS

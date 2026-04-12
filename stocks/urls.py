@@ -20,9 +20,12 @@ urlpatterns = [
     path("teamview/join/<str:team_name>", views.join_team, name="jointeam"),
     path("teamview/leave/<str:team_name>", views.leave_team, name="leaveteam"),
     path("teamview/<str:team_name>/", views.teamview, name="teamview"),
-    path("leaderboard/", views.leaderboard, name="leaderboard"),
 
     # Investment pages
     path("user/get_balance/", views.getUserBalance, name="getuserbalance"),
     path("user/invest/", views.investInStock, name="investinstock"),
+
+    # Leaderboard
+    path("leaderboard/", views.leaderboard, name="leaderboard"),
+    path("leaderboard/top_teams", views.getTopTeamsAndStocks, name="top_teams")
 ]

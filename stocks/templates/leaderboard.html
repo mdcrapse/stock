@@ -3,8 +3,6 @@
 {% block title %}Leaderboard{% endblock %}
 
 {% load static %}
-{% block scripts %}
-{% endblock %}
 
 {% block content %}
 
@@ -23,7 +21,6 @@
             <thead>
                 <tr>
                     <th scope="col">Team Name</th>
-                    <th scope="col"># of Members</th>
                     <th scope="col">$ / Capita</th>
                     <th scope="col"></th>
                 </tr>
@@ -32,7 +29,6 @@
                 {% for team in teams %}
                 <tr>
                     <td>{{team.team_name}}</td>
-                    <td>{{team.num_members}}</td>
                     <td>{{ team.balance_per_capita|floatformat:2 }}</td>
                     <td>
                         <a href="{% url 'teamview' team_name=team.team_name %}" 
@@ -43,11 +39,42 @@
             </tbody>
         </table>
     </div>
-
     <div class="col-md-5">
-        <canvas id="teamsChart" class="teamsChart">
-            Your browser does not support the canvas element.
-        </canvas>
+        <div id="teamsChart" class="teamsChart">
+        </div>
     </div>
 </div>
+
+<hr>
+
+<div class="row">
+    <div class="text-center mx-auto">
+        <h2 class="display-5">Top Stocks</h2>
+        <p class="lead">The top 10 stocks, by share volume held by the top 5 teams.</p>
+    </div>
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Stock Ticker</th>
+                    <th scope="col">Total Shares</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in top_stocks %}
+                <tr>
+                    <td>{{ stock.ticker }}</td>
+                    <td>{{ stock.total_shares }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.25.4/graphology.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/2.4.0/sigma.min.js"></script>
+<script src="{% static 'js/leaderboard.js' %}"></script>
 {% endblock %}

@@ -96,8 +96,27 @@ async function populateGraph() {
     names = Object.keys(team_data);
     populateTeams(names, team_data);
 
-    const sigmaInstance = new Sigma(graph, container, {
+    const s = new Sigma(graph, container, {
         renderLabels: true,
         labelSize: 14,
+        labelRenderedSizeThreshold: 12,
+        labelRenderer: (context, data, settings) => {
+                const size = settings.labelSize;
+                const font = settings.labelFont;
+                const weight = settings.labelWeight;
+
+                context.font = `${weight} ${size}px ${font}`;
+                context.fillStyle = "#333";
+                context.textAlign = "center"; // Center the text horizontally
+                context.textBaseline = "top"; // Align the top of the text to our Y coordinate
+
+                // data.x and data.y are the node's coordinates
+                // We add data.size to the Y coordinate to move the text below the circle
+                context.fillText(
+                    data.label,
+                    data.x,
+                    data.y + data.size + 3 // 3px buffer between node and text
+                );
+            }
     });
 }

@@ -17,27 +17,29 @@
 
 <div class="row">
     <div class="col-md-7">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Team Name</th>
-                    <th scope="col">$ / Capita</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for team in teams %}
-                <tr>
-                    <td>{{team.team_name}}</td>
-                    <td>{{ team.balance_per_capita|floatformat:2 }}</td>
-                    <td>
-                        <a href="{% url 'teamview' team_name=team.team_name %}" 
-                           type="button" id="submit-btn" class="btn btn-primary w-100">View</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-container" style="height: 400px; overflow-y: auto;">
+            <table class="table table-sticky">
+                <thead>
+                    <tr>
+                        <th scope="col">Team Name</th>
+                        <th scope="col">$ / Capita</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in teams %}
+                    <tr>
+                        <td>{{team.team_name}}</td>
+                        <td>{{ team.balance_per_capita|floatformat:2 }}</td>
+                        <td>
+                            <a href="{% url 'teamview' team_name=team.team_name %}" 
+                            type="button" id="submit-btn" class="btn btn-primary w-100">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-md-5">
         <div id="teamsChart" class="teamsChart">

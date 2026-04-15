@@ -18,22 +18,25 @@ async function populateGraph() {
 
     // Create central node
     graph.addNode("graph_root", {
-        label: "Top 5 Teams",
+        label: "H-Index Teams",
         x: 0,
         y: 0,
         size: 25,
         color: "#ff4757",
     });
 
-    function populateTeams(names, team_data, radius = 10) {
+    function populateTeams(names, team_data) {
+        const angleOffset = 0;//Math.random() * (3);
         const count = names.length;
         let i = 0;
         for(const name of names) {
             const nodeId = name;
-            const angle = (i * 2 * Math.PI) / count;
+            const angle = angleOffset + (i * 2 * Math.PI) / count;
 
-            const posX = radius * Math.cos(angle);
-            const posY = radius * Math.sin(angle);
+            const dynamicRadius = 5 + (names.length * 1.5);
+
+            const posX = dynamicRadius * Math.cos(angle);
+            const posY = dynamicRadius * Math.sin(angle);
 
             // Add the team node
             graph.addNode(nodeId, {
@@ -64,10 +67,11 @@ async function populateGraph() {
 
             stocks = team_data[team];
             const count = stocks.length;
+            const angleOffset = 0;//Math.random() * (3);
             let i = 0;
             for(const stock of stocks) {
                 const nodeId = `${parent_name}-${stock.ticker}`;
-                const angle = (i * 2 * Math.PI) / count;
+                const angle = angleOffset + (i * 2 * Math.PI) / count;
 
                 const posX = parent_posX + (radius * Math.cos(angle));
                 const posY = parent_posY + (radius * Math.sin(angle));
@@ -96,27 +100,42 @@ async function populateGraph() {
     names = Object.keys(team_data);
     populateTeams(names, team_data);
 
-    const s = new Sigma(graph, container, {
+    let s;
+
+    s = new Sigma(graph, container, {
         renderLabels: true,
         labelSize: 14,
         labelRenderedSizeThreshold: 12,
-        labelRenderer: (context, data, settings) => {
-                const size = settings.labelSize;
-                const font = settings.labelFont;
-                const weight = settings.labelWeight;
+        nodeReducer: (node, data) => {
+            const res = { ...data };
+            
+            if (typeof s !== "undefined") {
+                const ratio = s.getCamera().getState().ratio;
 
-                context.font = `${weight} ${size}px ${font}`;
-                context.fillStyle = "#333";
-                context.textAlign = "center"; // Center the text horizontally
-                context.textBaseline = "top"; // Align the top of the text to our Y coordinate
-
-                // data.x and data.y are the node's coordinates
-                // We add data.size to the Y coordinate to move the text below the circle
-                context.fillText(
-                    data.label,
-                    data.x,
-                    data.y + data.size + 3 // 3px buffer between node and text
-                );
+                if (data.color === "#2ede7d" && ratio > 0.5) {
+                    res.hidden = true;
+                    res.label = "";
+                }
             }
+
+            return res;
+        },
+
+        edgeReducer: (edge, data) => {
+            const res = { ...data };
+            if (typeof s !== "undefined") {
+                const ratio = s.getCamera().getState().ratio;
+                if (ratio > 0.5 && edge.includes("-")) {
+                    res.hidden = true;
+                }
+            }
+            return res;
+        }
     });
+
+    s.getCamera().on("updated", () => {
+        s.refresh();
+    });
+
+    s.refresh();
 }

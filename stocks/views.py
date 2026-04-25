@@ -338,10 +338,10 @@ def getTopTeamsAndStocks(request: HttpRequest) -> JsonResponse:
 @require_http_methods(["POST"])
 def sellStock(request: HttpRequest) -> HttpResponse:
     user = request.user
-    ticker_symbol = request.POST.get('ticker_symbol')
     
     try:
         shares_to_sell = int(request.POST.get('shares', 0))
+        ticker_symbol = request.POST.get('ticker_symbol')
         
         # Check for ownership
         user_ownership = Owns.objects.get(user=user, stock__ticker=ticker_symbol)
@@ -355,13 +355,31 @@ def sellStock(request: HttpRequest) -> HttpResponse:
             
             # Update db
             stock_item.shares -= shares_to_sell
+            stock_item.value -= total_value_dollars
             user.balance += total_value_cents
             
+            # Save or delete the elements
             if(stock_item.shares <= 0):
                 stock_item.delete()
             else:
                 stock_item.save()
             user.save()
+
+            # Create a new transaction
+            new_transaction = Transaction(
+                shares = -1 * shares_to_sell,
+                ticker = ticker_symbol,
+                date = datetime.datetime.now()
+            )
+
+            new_transaction.save()
+
+            new_transaction_history = TransactionHistory(
+                user=user,
+                transaction=new_transaction
+            )
+
+            new_transaction_history.save()
 
             messages.success(request, f"Successfully sold {shares_to_sell} shares of {ticker_symbol}")
         else:

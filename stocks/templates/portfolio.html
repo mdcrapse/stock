@@ -102,16 +102,18 @@
                 <th scope="col">Cost</th>
                 <th scope="col">Value</th>
                 <th scope="col">Loss/Gain</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             {% for stock in stocks %}
             <tr>
-                <td>{{stock.ticker}}</td>
+                <td><p class="ticker">{{ stock.ticker }}</p></td>
                 <td>{{stock.shares}}</td>
                 <td>${{stock.value}}</td>
                 <td>≈ ${{stock.actual_value}}</td>
                 <td>≈ ${{stock.value_diff}}</td>
+                <td><button type="button" class="btn btn-primary btn-modal" data-bs-toggle="modal" data-bs-target="#sellStockModal">Sell Stock</button></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -141,4 +143,34 @@
     </table>
 </div>
 
+<div class="modal fade" id="sellStockModal" tabindex="-1" aria-labelledby="sellStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sell Stock</h5>
+            </div>
+            <form method="post" action="/sell_stock/" id="sell-form">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="ticker">Ticker</label>
+                        <input type="text" name="ticker_symbol" class="form-control" id="ticker" placeholder="Ticker Symbol">
+                    </div>
+                    <div class="form-group">
+                        <label for="sellVolume">Volume to Sell</label>
+                        <input type="number" name="shares" class="form-control" id="sellVolume" placeholder="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Sell</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/portfolio.js' %}"></script>
 {% endblock %}

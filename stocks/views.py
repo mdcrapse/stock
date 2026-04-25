@@ -334,6 +334,46 @@ def getTopTeamsAndStocks(request: HttpRequest) -> JsonResponse:
 
     return JsonResponse({'team_stocks': team_stocks})
 
+@login_required
+@require_http_methods(["POST"])
+def sellStock(request: HttpRequest) -> HttpResponse:
+    user = request.user
+    ticker_symbol = request.POST.get('ticker_symbol')
+    
+    try:
+        shares_to_sell = int(request.POST.get('shares', 0))
+        
+        # Check for ownership
+        user_ownership = Owns.objects.get(user=user, stock__ticker=ticker_symbol)
+        stock_item = user_ownership.stock
+        
+        if stock_item.shares >= shares_to_sell:
+            # Get the sell price
+            prices_dict = _current_stock_price([(ticker_symbol, shares_to_sell)])
+            total_value_dollars = prices_dict[ticker_symbol]
+            total_value_cents = int(total_value_dollars * 100) # Convert to cents
+            
+            # Update db
+            stock_item.shares -= shares_to_sell
+            user.balance += total_value_cents
+            
+            if(stock_item.shares <= 0):
+                stock_item.delete()
+            else:
+                stock_item.save()
+            user.save()
+
+            messages.success(request, f"Successfully sold {shares_to_sell} shares of {ticker_symbol}")
+        else:
+            messages.error(request, "Insufficient shares.")
+            
+    except (Owns.DoesNotExist, ValueError):
+        messages.error(request, "Invalid stock or quantity.")
+    except Exception as e:
+        messages.error(request, f"Transaction failed: {str(e)}")
+
+    return redirect("portfolio", username=user.username)
+
 # ================
 # HELPER FUNCTIONS
 # ================

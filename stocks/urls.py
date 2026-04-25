@@ -24,6 +24,7 @@ urlpatterns = [
     # Investment pages
     path("user/get_balance/", views.getUserBalance, name="getuserbalance"),
     path("user/invest/", views.investInStock, name="investinstock"),
+    path("sell_stock/", views.sellStock, name="sellstock"),
 
     # Leaderboard
     path("leaderboard/", views.leaderboard, name="leaderboard"),

@@ -1,0 +1,26 @@
+\contentsline {section}{\numberline {1}Project}{3}{}%
+\contentsline {section}{\numberline {2}System Design}{3}{}%
+\contentsline {subsection}{\numberline {2.1}Database}{3}{}%
+\contentsline {subsection}{\numberline {2.2}Backend}{3}{}%
+\contentsline {subsection}{\numberline {2.3}Frontend}{3}{}%
+\contentsline {subsection}{\numberline {2.4}Stock Predictor}{4}{}%
+\contentsline {section}{\numberline {3}Functional Components}{4}{}%
+\contentsline {subsection}{\numberline {3.1}Database}{4}{}%
+\contentsline {subsection}{\numberline {3.2}Backend}{4}{}%
+\contentsline {subsection}{\numberline {3.3}Frontend}{4}{}%
+\contentsline {subsection}{\numberline {3.4}User Login}{4}{}%
+\contentsline {subsection}{\numberline {3.5}Stock Predictor}{4}{}%
+\contentsline {subsection}{\numberline {3.6}Leaderboards}{4}{}%
+\contentsline {subsection}{\numberline {3.7}Team View}{4}{}%
+\contentsline {subsection}{\numberline {3.8}Administration Utilities}{5}{}%
+\contentsline {section}{\numberline {4}Required Queries}{5}{}%
+\contentsline {subsection}{\numberline {4.1}Co-Author Network}{5}{}%
+\contentsline {subsection}{\numberline {4.2}H-Index Filter}{5}{}%
+\contentsline {subsection}{\numberline {4.3}Q1 Journal Influence Network}{6}{}%
+\contentsline {section}{\numberline {5}Deviations From the Original Plan}{6}{}%
+\contentsline {section}{\numberline {6}Progress Reports}{7}{}%
+\contentsline {subsection}{\numberline {6.1}Phase I}{7}{}%
+\contentsline {subsection}{\numberline {6.2}Phase II}{7}{}%
+\contentsline {subsection}{\numberline {6.3}Phase III}{7}{}%
+\contentsline {section}{\numberline {7}Validation}{8}{}%
+\contentsline {section}{\numberline {8}Timeline of Deliverables}{12}{}%

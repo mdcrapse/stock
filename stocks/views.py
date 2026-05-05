@@ -62,7 +62,7 @@ def teams(request: HttpRequest) -> HttpResponse:
         search = request.POST.get('search')
         teams = Team.objects.filter(team_name__icontains=search).order_by('-balance_per_capita')
     else:
-        teams = Team.objects.order_by('-balance_per_capita')[:10]
+        teams = Team.objects.order_by('-balance_per_capita')
 
     view_teams = []
     for t in teams:
@@ -205,6 +205,13 @@ def add_team(request: HttpResponse) -> HttpResponse:
         )
         new_team.save()
         messages.success(request, "Team added successfully!")
+
+        new_member = Member(
+            user=request.user,
+            team=new_team,
+        )
+
+        new_member.save()
 
     return redirect('teams')
 
